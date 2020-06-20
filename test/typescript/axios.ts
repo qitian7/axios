@@ -1,3 +1,6 @@
+/** axios的ts测试
+ */
+
 import axios, {
   AxiosRequestConfig,
   AxiosResponse,
@@ -130,7 +133,7 @@ axios.get<User>('/user', { params: { id: 12345 } })
 axios.head<User>('/user')
 	.then(handleUserResponse)
     .catch(handleError);
-    
+
 axios.options<User>('/user')
 	.then(handleUserResponse)
 	.catch(handleError);
@@ -251,6 +254,7 @@ instance1.defaults.timeout = 2500;
 
 // Interceptors
 
+// @ts-ignore
 const requestInterceptorId: number = axios.interceptors.request.use(
   (config: AxiosRequestConfig) => config,
   (error: any) => Promise.reject(error)
@@ -264,8 +268,10 @@ axios.interceptors.request.use(
 );
 
 axios.interceptors.request.use((config: AxiosRequestConfig) => config);
+// @ts-ignore
 axios.interceptors.request.use((config: AxiosRequestConfig) => Promise.resolve(config));
 
+// @ts-ignore
 const responseInterceptorId: number = axios.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error: any) => Promise.reject(error)
@@ -273,6 +279,7 @@ const responseInterceptorId: number = axios.interceptors.response.use(
 
 axios.interceptors.response.eject(responseInterceptorId);
 
+// @ts-ignore
 axios.interceptors.response.use(
   (response: AxiosResponse) => Promise.resolve(response),
   (error: any) => Promise.reject(error)
@@ -332,6 +339,7 @@ axios.get('/user')
   .catch((error: any) => 'foo')
   .then((value: string) => {});
 
+// @ts-ignore
 axios.get('/user')
   .catch((error: any) => Promise.resolve('foo'))
   .then((value: string) => {});

@@ -9,7 +9,7 @@ describe('interceptors', function () {
     axios.interceptors.response.handlers = [];
   });
 
-  it('should add a request interceptor', function (done) {
+   it('should add a request interceptor', function (done) {
     axios.interceptors.request.use(function (config) {
       config.headers.test = 'added by interceptor';
       return config;

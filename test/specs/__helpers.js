@@ -12,37 +12,37 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
 jasmine.getEnv().defaultTimeoutInterval = 20000;
 
 // Get Ajax request using an increasing timeout to retry
-getAjaxRequest = (function () {
-var attempts = 0;
-var MAX_ATTEMPTS = 5;
-var ATTEMPT_DELAY_FACTOR = 5;
+getAjaxRequest = (function () { // 获取ajax的请求 (类似模拟服务器, 接收ajax请求)
+  var attempts = 0;
+  var MAX_ATTEMPTS = 5;
+  var ATTEMPT_DELAY_FACTOR = 5;
 
-function getAjaxRequest() {
-  return new Promise(function (resolve, reject) {
-    attempts = 0;
-    attemptGettingAjaxRequest(resolve, reject);
-  });
-}
-
-function attemptGettingAjaxRequest(resolve, reject) {
-  var delay = attempts * attempts * ATTEMPT_DELAY_FACTOR;
-
-  if (attempts++ > MAX_ATTEMPTS) {
-    reject(new Error('No request was found'));
-    return;
+  function getAjaxRequest() {
+    return new Promise(function (resolve, reject) {
+      attempts = 0;
+      attemptGettingAjaxRequest(resolve, reject);
+    });
   }
 
-  setTimeout(function () {
-    var request = jasmine.Ajax.requests.mostRecent();
-    if (request) {
-      resolve(request);
-    } else {
-      attemptGettingAjaxRequest(resolve, reject);
-    }
-  }, delay);
-}
+  function attemptGettingAjaxRequest(resolve, reject) {
+    var delay = attempts * attempts * ATTEMPT_DELAY_FACTOR;
 
-return getAjaxRequest;
+    if (attempts++ > MAX_ATTEMPTS) {
+      reject(new Error('No request was found'));
+      return;
+    }
+
+    setTimeout(function () {
+      var request = jasmine.Ajax.requests.mostRecent();
+      if (request) {
+        resolve(request);
+      } else {
+        attemptGettingAjaxRequest(resolve, reject);
+      }
+    }, delay);
+  }
+
+  return getAjaxRequest;
 })();
 
 // Validate an invalid character error
@@ -50,13 +50,13 @@ validateInvalidCharacterError = function validateInvalidCharacterError(error) {
   expect(/character/i.test(error.message)).toEqual(true);
 };
 
-// Setup basic auth tests
+// Setup basic auth身份 验证tests
 setupBasicAuthTest = function setupBasicAuthTest() {
-  beforeEach(function () {
-    jasmine.Ajax.install();
+  beforeEach(function () { // 执行 断言之前, 先执行一次这个
+    jasmine.Ajax.install(); // "karma-jasmine-ajax": "^0.1.13",  模拟ajax调用
   });
 
-  afterEach(function () {
+  afterEach(function () { // 执行完 断言之后, 执行这个
     jasmine.Ajax.uninstall();
   });
 
@@ -77,23 +77,6 @@ setupBasicAuthTest = function setupBasicAuthTest() {
   });
 
   it('should accept HTTP Basic auth credentials with non-Latin1 characters in password', function (done) {
-    axios('/foo', {
-      auth: {
-        username: 'Aladdin',
-        password: 'open ßç£☃sesame'
-      }
-    });
-
-    setTimeout(function () {
-      var request = jasmine.Ajax.requests.mostRecent();
-      console.log(request.requestHeaders['Authorization'], '\n\n\n');
-
-      expect(request.requestHeaders['Authorization']).toEqual('Basic QWxhZGRpbjpvcGVuIMOfw6fCo+KYg3Nlc2FtZQ==');
-      done();
-    }, 100);
-  });
-
-  it('should fail to encode HTTP Basic auth credentials with non-Latin1 characters in username', function (done) {
     axios('/foo', {
       auth: {
         username: 'Aladßç£☃din',

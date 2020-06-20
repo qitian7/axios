@@ -38,6 +38,7 @@ describe('utils::merge', function () {
       }
     });
   });
+});
 
   it('should remove all references from nested objects', function () {
     var a = {foo: {bar: 123}};

@@ -8,6 +8,8 @@ var fs = require('fs');
 var path = require('path');
 var server, proxy;
 
+// 测试库主要看断言, 此处是 assert
+
 describe('supports http with nodejs', function () {
 
   afterEach(function () {
@@ -27,7 +29,7 @@ describe('supports http with nodejs', function () {
     }
   });
 
-  it('should respect the timeout property', function (done) {
+  it('should respect遵守 the timeout超时 property属性', function (done) {
 
     server = http.createServer(function (req, res) {
       setTimeout(function () {

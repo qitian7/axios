@@ -8,8 +8,10 @@
     <h1>axios.get</h1>
     <ul id="people" class="list-unstyled"></ul>
 
+<!--    <script src="https://unpkg.com/axios/dist/axios.js"></script>-->
     <script src="/axios.min.js"></script>
     <script>
+      debugger
       axios.get('/get/server')
         .then(function (response) {
           document.getElementById('people').innerHTML = response.data.map(function (person) {

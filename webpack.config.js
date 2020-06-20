@@ -2,7 +2,7 @@ var webpack = require('webpack');
 var config = {};
 
 function generateConfig(name) {
-  var uglify = name.indexOf('min') > -1;
+  var uglify = name.indexOf('min') > -1; // true的话, 就是 'axios.min'
   var config = {
     entry: './index.js',
     output: {

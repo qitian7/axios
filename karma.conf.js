@@ -1,8 +1,20 @@
 // Karma configuration
 // Generated on Fri Aug 15 2014 23:11:13 GMT-0500 (CDT)
 
-var webpack = require('webpack');
+/** karma
+ *    Karma是一个基于Node.js的JavaScript测试执行过程管理工具
+ *      1. 像 流程 管理 工具
+ *      2. 在这里可以布置:
+ *          1. 测试框架  frameworks: ['jasmine-ajax', 'jasmine', 'sinon'],
+ *          2. 预处理器  preprocessors: { 'xx.js': ['webpack', 'sourcemap']}
+ *          3. 使用什么浏览器平台(多浏览器平台测试)  browsers: [xx], customLaunchers: {xx}
+ */
 
+
+// saucelabs用不了, 用puppeteer代替
+process.env.CHROME_BIN = require('puppeteer').executablePath()
+
+var webpack = require('webpack');
 function createCustomLauncher(browser, version, platform) {
   return {
     base: 'SauceLabs',
@@ -16,10 +28,20 @@ module.exports = function(config) {
   var customLaunchers = {};
   var browsers = [];
 
+  /** 目前无法使用
+   *     原因: 此处需要 SAUCE 的 账号和密钥, 否则不能使用 SAUCE 进行多平台 headless brower test
+   *  可以搜索saucelabs 教程
+   *    现在目前好像用不了(注册不了账号 服务器错误406) https://wiki.saucelabs.com/display/public/DOCS/The+Sauce+Labs+Cookbook+Home
+   *    https://www.cnblogs.com/sparkling-ly/p/5653402.html
+   */
+  console.log(process.env.SAUCE_USERNAME , process.env.SAUCE_ACCESS_KEY)
   if (process.env.SAUCE_USERNAME || process.env.SAUCE_ACCESS_KEY) {
     customLaunchers = {};
 
     var runAll = true;
+
+    /** 提供 Headless Browser 无头游览器 ( 没有图形界面GUI的浏览器, 只需构建dom树 不用重绘重排, 节省很多性能, 适合test和爬虫 )
+     */
     var options = [
       'SAUCE_CHROME',
       'SAUCE_FIREFOX',
@@ -115,82 +137,80 @@ module.exports = function(config) {
     browsers = ['Firefox'];
   } else {
     console.log('Running locally since SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables are not set.');
-    browsers = ['Firefox', 'Chrome', 'Safari', 'Opera'];
+    // browsers = ['Firefox', 'Chrome', 'Safari', 'Opera'];
+    browsers = ['Firefox', 'ChromeHeadless', 'Safari', 'Opera']
   }
 
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine-ajax', 'jasmine', 'sinon'],
 
-
     // list of files / patterns to load in the browser
-    files: [
+    files: [ // specs 的意思是  标准 规范 的意思   specification 缩写
       'test/specs/__helpers.js',
       'test/specs/**/*.spec.js',
     ],
 
-
     // list of files to exclude
     exclude: [
-
     ],
 
-
-    // preprocess matching files before serving them to the browser
+    // preprocess预处理器 matching匹配 files before serving提供 them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
+    preprocessors: { // 预处理
       'test/specs/__helpers.js': ['webpack', 'sourcemap'],
       'test/specs/**/*.spec.js': ['webpack', 'sourcemap']
     },
 
-
-    // test results reporter to use
+    // test results reporter记者,记录 to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    // Disable code coverage, as it's breaking CI:
+    // Disable code coverage覆盖率, as因为 it's breaking CI:
     // reporters: ['dots', 'coverage', 'saucelabs'],
     reporters: ['dots', 'saucelabs'],
-
 
     // web server port
     port: 9876,
 
-
-    // Increase timeouts to prevent the issue with disconnected tests (https://goo.gl/nstA69)
+    // Increase增加 timeouts超时 to prevent防止 the issue with disconnected tests (https://goo.gl/nstA69)
     captureTimeout: 4 * 60 * 1000,
     browserDisconnectTimeout: 10000,
     browserDisconnectTolerance: 1,
     browserNoActivityTimeout: 4 * 60 * 1000,
 
-
     // enable / disable colors in the output (reporters and logs)
     colors: true,
-
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
-
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: false,
-
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: browsers,
+    customLaunchers: customLaunchers,
 
+    // // saucelabs用不了, 用puppeteer代替
+    // browsers: ['ChromeHeadless'],
+    // customLaunchers: {
+    //   Chrome_without_security: {
+    //     base: 'Chrome',
+    //     flags: ['--disable-web-security', '--disable-site-isolation-trials']
+    //   }
+    // },
 
-    // Continuous Integration mode
-    // if true, Karma captures browsers, runs the tests and exits
+    // Continuous Integration整合 mode
+    // if true, Karma captures捕获 browsers, runs the tests and exits
     singleRun: false,
 
-    // Webpack config
+    // Webpack config (作用: 1. 打包模块化, 不然require没法用.  2, 压缩)
     webpack: {
       cache: true,
       devtool: 'inline-source-map',
@@ -222,14 +242,12 @@ module.exports = function(config) {
       }
     },
 
-
-    // Coverage reporting
+    // Coverage reporting 覆盖率 报告
     coverageReporter: {
       type: 'lcov',
       dir: 'coverage/',
       subdir: '.'
     },
-
 
     // SauceLabs config
     sauceLabs: {
@@ -239,8 +257,6 @@ module.exports = function(config) {
         logfile: 'sauce_connect.log'
       },
       public: 'public'
-    },
-
-    customLaunchers: customLaunchers
+    }
   });
 };

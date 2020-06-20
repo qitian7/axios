@@ -1,3 +1,4 @@
+/* axios v0.19.2 | (c) 2020 by Matt Zabriskie */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -87,10 +88,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return instance;
 	}
 	
-	// Create the default instance to be exported
+	// Create the default instance to be exported 输出, 出口
 	var axios = createInstance(defaults);
 	
-	// Expose Axios class to allow class inheritance
+	// Expose Axios class 类 to allow class inheritance 继承
 	axios.Axios = Axios;
 	
 	// Factory for creating new instances
@@ -511,6 +512,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Dispatch a request
 	 *
 	 * @param {Object} config The config specific for this request (merged with this.defaults)
+	 * 配置 此请求的特定配置（与this.defaults合并)
+	 */
+	/** 参数 config 例子:
+	     {
+	        method: "get"
+	        url: "/get/server"
+	     }
 	 */
 	Axios.prototype.request = function request(config) {
 	  /*eslint no-param-reassign:0*/
@@ -524,7 +532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  config = mergeConfig(this.defaults, config);
 	
-	  // Set config.method
+	  // Set config.method   转成小写, 默认get
 	  if (config.method) {
 	    config.method = config.method.toLowerCase();
 	  } else if (this.defaults.method) {
@@ -533,10 +541,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    config.method = 'get';
 	  }
 	
-	  // Hook up interceptors middleware
+	  /** Promise.resolve 是抛出一个值, 给.then
+	    const promise1 = Promise.resolve(123);
+	
+	    promise1.then(function(value) {
+	      console.log(value);
+	      // expected output: 123
+	    });
+	   */
+	
+	  // Hook up 连接 interceptors 监听器 middleware
 	  var chain = [dispatchRequest, undefined];
 	  var promise = Promise.resolve(config);
 	
+	  // 拦截器
 	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
 	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
 	  });
@@ -557,10 +575,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
 	};
 	
+	// axios.get('xx')等等api 的程序起点都是这里
 	// Provide aliases for supported request methods
 	utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
 	  /*eslint func-names:0*/
 	  Axios.prototype[method] = function(url, config) {
+	    /** 例子:
+	       {
+	          method: "get"
+	          url: "/get/server"
+	       }
+	     */
 	    return this.request(utils.merge(config || {}, {
 	      method: method,
 	      url: url
@@ -667,6 +692,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var utils = __webpack_require__(2);
 	
+	// 拦截器
 	function InterceptorManager() {
 	  this.handlers = [];
 	}
@@ -739,6 +765,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/**
 	 * Dispatch a request to the server using the configured adapter.
+	 * 使用配置的适配器向服务器发送请求。
 	 *
 	 * @param {object} config The config that is to be used for the request
 	 * @returns {Promise} The Promise to be fulfilled
@@ -763,6 +790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    config.headers
 	  );
 	
+	  // cleanHeaderConfig 删除头部配置
 	  utils.forEach(
 	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
 	    function cleanHeaderConfig(method) {
@@ -770,8 +798,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  );
 	
+	  // 初始化时 配置了 调用xhr.js
 	  var adapter = config.adapter || defaults.adapter;
 	
+	  // adapter(config) 发起请求
 	  return adapter(config).then(function onAdapterResolution(response) {
 	    throwIfCancellationRequested(config);
 	
@@ -871,6 +901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	var defaults = {
+	  // 适配器 (比如耳机转type-c的接口)
 	  adapter: getDefaultAdapter(),
 	
 	  transformRequest: [function transformRequest(data, headers) {
@@ -919,6 +950,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  xsrfHeaderName: 'X-XSRF-TOKEN',
 	
 	  maxContentLength: -1,
+	  maxBodyLength: -1,
 	
 	  validateStatus: function validateStatus(status) {
 	    return status >= 200 && status < 300;
@@ -1031,6 +1063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    // Handle browser request cancellation (as opposed to a manual cancellation)
+	    // 处理浏览器请求取消（与手动取消相反）
 	    request.onabort = function handleAbort() {
 	      if (!request) {
 	        return;
@@ -1068,6 +1101,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Add xsrf header
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
+	    // 添加xsrf标头
+	    // 仅在标准浏览器环境中运行时才能执行此操作。
+	    // 特别是如果我们是网络工作者或本机人员，则不会。
 	    if (utils.isStandardBrowserEnv()) {
 	      var cookies = __webpack_require__(21);
 	
@@ -1163,7 +1199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	module.exports = function settle(resolve, reject, response) {
 	  var validateStatus = response.config.validateStatus;
-	  if (!validateStatus || validateStatus(response.status)) {
+	  if (!response.status || !validateStatus || validateStatus(response.status)) {
 	    resolve(response);
 	  } else {
 	    reject(createError(
@@ -1227,7 +1263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  error.response = response;
 	  error.isAxiosError = true;
 	
-	  error.toJSON = function() {
+	  error.toJSON = function toJSON() {
 	    return {
 	      // Standard
 	      message: this.message,
@@ -1387,6 +1423,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  // Standard browser envs have full support of the APIs needed to test
 	  // whether the request URL is of the same origin as current location.
+	  //   标准浏览器环境完全支持测试所需的API
+	  //   请求网址是否与当前位置具有相同的来源。
 	    (function standardBrowserEnv() {
 	      var msie = /(msie|trident)/i.test(navigator.userAgent);
 	      var urlParsingNode = document.createElement('a');
@@ -1424,14 +1462,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	      }
 	
+	      /** handler
+	         window.location.href: http://localhost:3000/get
+	         {
+	            hash: ""
+	            host: "localhost:3000"
+	            hostname: "localhost"
+	            href: "http://localhost:3000/get"
+	            pathname: "/get"
+	            port: "3000"
+	            protocol: "http"
+	            search: ""
+	         }
+	       */
 	      originURL = resolveURL(window.location.href);
 	
 	      /**
-	    * Determine if a URL shares the same origin as the current location
-	    *
-	    * @param {String} requestURL The URL to test
-	    * @returns {boolean} True if URL shares the same origin, otherwise false
-	    */
+	        * Determine if a URL shares the same origin as the current location
+	           * 判断请求的url 是否 同源
+	        *
+	        * @param {String} requestURL The URL to test
+	        * @returns {boolean} True if URL shares the same origin, otherwise false
+	        */
 	      return function isURLSameOrigin(requestURL) {
 	        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
 	        return (parsed.protocol === originURL.protocol &&
@@ -1518,7 +1570,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Config-specific merge-function which creates a new config-object
 	 * by merging two configuration objects together.
-	 *
+	 *  特定于配置的合并功能，可创建新的配置对象
+	     通过将两个配置对象合并在一起。
+	
 	 * @param {Object} config1
 	 * @param {Object} config2
 	 * @returns {Object} New object resulting from merging config2 to config1
@@ -1528,14 +1582,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  config2 = config2 || {};
 	  var config = {};
 	
-	  var valueFromConfig2Keys = ['url', 'method', 'params', 'data'];
-	  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy'];
+	  var valueFromConfig2Keys = ['url', 'method', 'data'];
+	  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy', 'params'];
 	  var defaultToConfig2Keys = [
 	    'baseURL', 'url', 'transformRequest', 'transformResponse', 'paramsSerializer',
 	    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
 	    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress',
-	    'maxContentLength', 'validateStatus', 'maxRedirects', 'httpAgent',
-	    'httpsAgent', 'cancelToken', 'socketPath'
+	    'maxContentLength', 'maxBodyLength', 'validateStatus', 'maxRedirects', 'httpAgent',
+	    'httpsAgent', 'cancelToken', 'socketPath', 'responseEncoding'
 	  ];
 	
 	  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
